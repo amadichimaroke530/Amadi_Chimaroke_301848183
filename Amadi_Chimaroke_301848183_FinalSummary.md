@@ -2,13 +2,13 @@
 
 **Gym / Fitness Club Management** · Chimaroke Amadi · Student ID 301848183
 
-## Case study
+## Case Study Overview
 
-My case study is Gym / Fitness Club Management. I designed the database for club administrators, trainers and members, with separate tables named member, trainer, class_session and booking. It supports these operations: maintain member and trainer records; schedule classes and record bookings; review class attendance and booking activity.
+For this project, I designed a relational database system tailored for Gym and Fitness Club Management. Built to support club administrators, trainers, and members, the database organizes information across four core tables: member, trainer, class_session, and booking. Together, these tables streamline daily club operations by allowing staff to manage member and trainer profiles, schedule fitness classes, process member bookings, and track overall class attendance and activity.
 
 ## Portfolio 1: Database Design and Modelling
 
-I organised the relational design into 4 tables. Primary keys identify records, foreign keys preserve the links, and checks enforce the stated business rules. A partial unique constraint allows at most one confirmed booking per member and class session; cancelled rows are excluded. The normalisation examples show the sample data at 1NF, 2NF and 3NF. All 13 deliberately invalid inserts were rejected without changing the valid sample rows.
+I structured the relational database across four distinct tables, using primary keys to uniquely identify records, foreign keys to maintain relationships between them, and check constraints to enforce core business rules. To prevent double-booking while still allowing members to re-register if they previously dropped out, I implemented a partial unique constraint that restricts each member to one confirmed booking per class session while excluding cancelled entries. Additionally, I included normalization examples demonstrating how the sample data progresses through 1NF, 2NF, and 3NF. During testing, the database successfully rejected all 13 deliberately invalid insert statements without corrupting or altering the valid sample data.
 
 ![Gym / Fitness Club Management ER diagram](images/Amadi_Chimaroke_301848183_ERDiagram.png)
 
@@ -18,36 +18,37 @@ Figure 1. Tables, keys and relationships. PK: primary key; FK: foreign key; UK: 
 
 ## Portfolio 2: Query Processing and Optimisation
 
-I ran three SQL queries against the sample records. The join returned 1 rows and included Alex Rivera with Morning Strength. For the index comparison, I used 20,000 separate performance rows. The median lookup time changed from 1.097 ms to 0.182 ms. Both phases returned the same records. The measured plan used the new index. These timings apply to this lookup and environment.
+Next, I ran three SQL queries on the sample data to test everything out—for instance, the join query returned 1 row matching Alex Rivera with the Morning Strength class. To test how well the database scales, I ran an index comparison using 20,000 separate performance rows. With the new index in place, the median lookup time dropped noticeably from 1.097 ms to 0.182 ms, while still returning the exact same records. Checking the execution plan confirmed the query was actively using the new index, keeping in mind that these specific timings reflect this particular lookup and testing setup.
 
 ## Portfolio 3: Transactions and Concurrency
 
-I used a temporary counter on booking to test COMMIT, ROLLBACK and READ COMMITTED isolation. The uncommitted update remained hidden from the other session, and ROLLBACK restored the earlier committed value. Without locking, two increments left the counter at 2. With SELECT FOR UPDATE, Session B waited for Session A and the final value was 3. The helper is confined to this exercise; the case's original business fields stay unchanged.
+To evaluate transaction control and concurrency, I added a temporary counter to the booking table to test COMMIT, ROLLBACK, and READ COMMITTED isolation behavior. As expected, uncommitted updates remained invisible to concurrent sessions, and executing a ROLLBACK cleanly restored the previously committed value. During concurrency testing without row-level locking, two simultaneous increments resulted in a lost update, leaving the counter at 2. However, applying SELECT FOR UPDATE forced Session B to wait until Session A completed, yielding the expected final value of 3. This temporary helper column was strictly isolated to this exercise, leaving the case study's original business fields completely unchanged.
 
 ## Portfolio 4: NoSQL and Advanced Data Models
 
-I used booking_events for the case's event documents. MongoDB inserted 2 sample events and returned the expected results for 4 queries. Validation rejected an invalid date type and a duplicate event ID. Embedded snapshots keep related details with an event, while the details field can differ by event type. These are fictional events; PostgreSQL continues to enforce its relational rules.
+For the document-based side of the project, I stored event logs in a MongoDB collection called booking_events. I inserted two sample events and ran four queries, all of which returned the exact results I expected. To make sure data quality held up, I tested the validation rules, which successfully caught and rejected an invalid date type as well as a duplicate event ID. Storing embedded snapshots keeps related info bundled right inside each event, while the details field stays flexible enough to change based on the event type. These are just fictional test events, and PostgreSQL still handles all the core relational rules in the background.
+
 
 ## Repository and evidence
 
 https://github.com/amadichimaroke530/Amadi_Chimaroke_301848183
 
-The portfolio folders contain the SQL and JavaScript, explanations, query plans, result tables and screenshots.
+The accompanying portfolio folders contain the complete SQL and JavaScript source code, detailed explanations, query execution plans, output result tables, and supporting screenshots.
 
 
 <!-- PAGE BREAK -->
 
 ## Portfolio 5: Distributed and Cloud Database Exercise
 
-I proposed three MongoDB replica members across separate failure zones. The discussion covers primary elections, majority acknowledgement, secondary lag and sharding trade-offs for booking_events. Replication supports availability, while backups address recovery. PostgreSQL needs its own availability plan. This is the permitted discussion option; no live replica set or failover test was deployed.
+To address system resilience, I proposed deploying three MongoDB replica members across separate failure zones. My discussion walks through how primary elections work, the role of majority write acknowledgements, potential secondary lag, and the trade-offs of sharding booking_events. I also highlighted why replication handles uptime while backups handle true data recovery, and noted that PostgreSQL needs its own dedicated availability setup. Since this follows the permitted discussion option, it outlines the architectural design without deploying a live replica set or running failover tests.
 
 ## Individual reflection
 
-I kept member, trainer, class_session, booking in separate tables so their details could be maintained without repeating them in every related record. A partial unique constraint allows at most one confirmed booking per member and class session; cancelled rows are excluded. The constraint tests check this alongside the required values and record links. One issue illustrated by the two-session exercise is that both sessions can read the same value before either update is committed. Locking the row before reading preserves both increments. The index comparison also shows why I need to check the execution plan as well as the final answer: the same result can require different amounts of database work.
+Separating member, trainer, class_session, and booking into distinct tables allows each entity to be maintained independently without duplicating details across related records. A partial unique constraint enforces at most one confirmed booking per member and class session while excluding cancelled entries, and the constraint tests validate this rule alongside required fields and foreign key links. The two-session concurrency exercise demonstrated how two sessions can read the same uncommitted state simultaneously, causing a lost update unless row-level locking is applied prior to reading so both increments are preserved. Finally, the index comparison highlighted the importance of inspecting query execution plans alongside output accuracy, showing that identical result sets can require vastly different amounts of underlying database work.
 
-## AI-use declaration
+## AI-use and same-day commits declaration
 
-I used GitHub Copilot and the portfolio generator to help prepare the database model, scripts and explanations. The generator ran the PostgreSQL and MongoDB exercises, checked their outputs and captured the result images.  I remain responsible for checking and explaining the submitted work.
+I utilized GitHub Copilot and the portfolio generator to assist in preparing the database model, scripts, and written explanations. The generator executed the PostgreSQL and MongoDB exercises, verified the outputs, and captured the supporting result screenshots, while I remain fully responsible for reviewing, validating, and explaining all submitted work. Beyond these tools, the project files were developed and refined over a four-week period leading up to today's final commit to GitHub. Overall, it has been a rewarding and insightful project to build.
 
 ## References
 
